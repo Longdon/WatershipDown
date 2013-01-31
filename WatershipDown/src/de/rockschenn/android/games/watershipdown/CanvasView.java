@@ -84,9 +84,15 @@ public class CanvasView extends SurfaceView{
 	}
 	
 	// returns the distance between two points
-	public double getDelta(Point prevPoint, Point newPoint){
-		int dx = newPoint.x-prevPoint.x;
-		int dy = newPoint.y-prevPoint.y;
-		return Math.sqrt(dx*dx + dy*dy);
+	public double getDistance(Point prevPoint, Point newPoint){
+		Point dVec = getDeltaVector(prevPoint, newPoint);
+		return Math.sqrt(dVec.x*dVec.x + dVec.y*dVec.y);
+	}
+	
+	// returns the directionVector from Point a to Point b
+	public Point getDeltaVector(Point a, Point b){
+		int dx = b.x-a.x;
+		int dy = b.y-a.y;
+		return new Point(dx,dy);
 	}
 }
