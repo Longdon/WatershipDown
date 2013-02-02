@@ -32,13 +32,13 @@ public class MainActivity extends Activity {
 	    canView = new CanvasView(this, screenSize);
 	    Log.d("Main","Canvas init complete.");
         
-        //setContentView(canView);
-	    setContentView(R.layout.activity_main);
+        setContentView(canView);
+	    //setContentView(R.layout.activity_main);
 	    
-        /* start redraw-thread
+        // start redraw-thread
         redrawThread = new RedrawThread(canView);
         redrawThread.start();
-        */
+        
     }
 
     @Override
@@ -46,4 +46,12 @@ public class MainActivity extends Activity {
         getMenuInflater().inflate(R.menu.activity_main, menu);
         return true;
     }
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		redrawThread.endThread = true;
+	}
+    
+    
 }

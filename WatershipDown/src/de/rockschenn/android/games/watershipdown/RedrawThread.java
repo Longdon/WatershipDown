@@ -20,6 +20,7 @@ public class RedrawThread extends Thread{
 		
 		while(!endThread){
 			// redraw Canvas
+			canView.update();
 			redraw();
 		}
 		Log.d("AnimationThread", "Ended");

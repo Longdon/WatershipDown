@@ -1,10 +1,14 @@
 package de.rockschenn.android.games.watershipdown;
 
+import de.rockschenn.android.games.watershipdown.objects.GameObject;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -21,11 +25,15 @@ public class CanvasView extends SurfaceView{
 	private Paint paintYellow;
 	private Point screenSize;
 	
+	//-- Testing Stuff ---
+	private Bitmap bm;
+	private GameObject go;
+	//--------------------
 	
 	public CanvasView(Context context, Point size) {
 		super(context);
 		
-		// init some colors
+		// init some paints
 		Log.d("CanView","");
 		paintBlack = new Paint();
 		paintBlack.setColor(Color.BLACK);
@@ -58,6 +66,17 @@ public class CanvasView extends SurfaceView{
         // set screensize
         screenSize = size;
         screenSize.set(size.x, size.y);
+        
+        //-- testing Stuff --
+        bm = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
+        go = new GameObject(bm);
+        go.setPosition(new Point(50,50));
+        //-------------------
+	}
+	
+	//Update GameObjects here
+	public void update(){
+		go.update();
 	}
 	
 	@Override
@@ -68,10 +87,10 @@ public class CanvasView extends SurfaceView{
 		if(c != null){
 			// draws black background
 			c.drawColor(Color.BLACK);
-	        
+			
 			// draw helping stuff here for bugfixing
 			if(debug){
-	    		
+	    		go.drawGameObject(c);	//Draw Test-GameObject
 			}
 		}
         
@@ -83,16 +102,5 @@ public class CanvasView extends SurfaceView{
 		return super.onTouchEvent(event);
 	}
 	
-	// returns the distance between two points
-	public double getDistance(Point prevPoint, Point newPoint){
-		Point dVec = getDeltaVector(prevPoint, newPoint);
-		return Math.sqrt(dVec.x*dVec.x + dVec.y*dVec.y);
-	}
 	
-	// returns the directionVector from Point a to Point b
-	public Point getDeltaVector(Point a, Point b){
-		int dx = b.x-a.x;
-		int dy = b.y-a.y;
-		return new Point(dx,dy);
-	}
 }
