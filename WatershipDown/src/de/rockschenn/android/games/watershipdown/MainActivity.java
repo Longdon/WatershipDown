@@ -35,9 +35,7 @@ public class MainActivity extends Activity {
         setContentView(canView);
 	    //setContentView(R.layout.activity_main);
 	    
-        // start redraw-thread
-        redrawThread = new RedrawThread(canView);
-        redrawThread.start();
+        
         
     }
 
@@ -47,8 +45,15 @@ public class MainActivity extends Activity {
         return true;
     }
 
+    @Override
+	protected void onResume() {
+		super.onStart();
+		// start redraw-thread
+        redrawThread = new RedrawThread(canView);
+        redrawThread.start();
+	}
 	@Override
-	protected void onDestroy() {
+	protected void onPause() {
 		super.onDestroy();
 		redrawThread.endThread = true;
 	}
