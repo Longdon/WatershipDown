@@ -1,6 +1,7 @@
 package de.rockschenn.android.games.watershipdown;
 
 import de.rockschenn.android.games.watershipdown.objects.GameObject;
+import de.rockschenn.android.games.watershipdown.objects.Vector2;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -8,7 +9,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
-import android.graphics.Rect;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -23,11 +23,15 @@ public class CanvasView extends SurfaceView{
 	private Paint paintWhite;
 	private Paint paintRed;
 	private Paint paintYellow;
+	private Paint paintBlue;
+	
 	private Point screenSize;
+	
 	
 	//-- Testing Stuff ---
 	private Bitmap bm;
 	private GameObject go;
+	private Vector2 testTarget;
 	//--------------------
 	
 	public CanvasView(Context context, Point size) {
@@ -43,6 +47,8 @@ public class CanvasView extends SurfaceView{
 		paintYellow.setColor(Color.argb(255, 210, 210, 100));
 		paintRed = new Paint();
 		paintRed.setColor(Color.RED);
+		paintBlue = new Paint();
+		paintBlue.setColor(Color.BLUE);
 		
 		// init surfaceholder
 		surfaceHolder = getHolder();
@@ -68,9 +74,13 @@ public class CanvasView extends SurfaceView{
         screenSize.set(size.x, size.y);
         
         //-- testing Stuff --
-        bm = BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher);
+        bm = BitmapFactory.decodeResource(getResources(), R.drawable.carrier);
         go = new GameObject(bm);
-        go.setPosition(new Point(50,50));
+        go.setPosition(new Vector2(250,500));
+        
+        //testTarget = new GameObject(bm);
+        testTarget = new Vector2(300,500);
+        go.setTarget(testTarget);
         //-------------------
 	}
 	
@@ -83,14 +93,17 @@ public class CanvasView extends SurfaceView{
 	protected void onDraw(Canvas c){
 		super.onDraw(c);
 		
-		Log.d("CanView","drawing");
+		//Log.d("CanView","drawing");
 		if(c != null){
 			// draws black background
 			c.drawColor(Color.BLACK);
 			
 			// draw helping stuff here for bugfixing
 			if(debug){
-	    		go.drawGameObject(c);	//Draw Test-GameObject
+	    		go.drawGameObject(c,0.1, debug);	//Draw Test-GameObject
+	    		
+	    		c.drawCircle((float)testTarget.x, (float)testTarget.y, 10, paintRed);
+	    		c.drawText("("+(int)(testTarget.x)+"|"+(int)(testTarget.y)+")", (int)(testTarget.x)-30, (int)(testTarget.y)-50, paintRed);
 			}
 		}
         
@@ -98,8 +111,11 @@ public class CanvasView extends SurfaceView{
 	
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
+		testTarget = new Vector2(event.getX(),event.getY());
+        go.setTarget(testTarget);
 		
-		return super.onTouchEvent(event);
+        
+        return super.onTouchEvent(event);
 	}
 	
 	

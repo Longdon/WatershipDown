@@ -1,5 +1,7 @@
 package de.rockschenn.android.games.watershipdown.objects;
 
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Point;
 
 public class Vector2 {
@@ -11,13 +13,13 @@ public class Vector2 {
 		this.x = x;
 		this.y = y;
 	}
-	//Constructs from Coordinates from Point pos
-	public Vector2(Point pos){
+	//Copy-Constructor
+	public Vector2(Vector2 pos){
 		this.x = pos.x;
 		this.y = pos.y;
 	}
 	//Creates Direction-Vector from Point a to Point b
-	public Vector2(Point a, Point b){
+	public Vector2(Vector2 a, Vector2 b){
 		this.x = b.x-a.x;
 		this.y = b.y-a.y;
 	}
@@ -66,9 +68,22 @@ public class Vector2 {
 		return Math.acos(getDotProduct(a, b)/(length(a)*length(b)));
 	}
 	
-	//Rotates this Vector towards target Position with specific speed
-	public void rotateTowards(Point target, double speed){
-		//TODO
+	public void rotate(double angle){
+		double x = this.x;
+		this.x = (Math.cos(angle)*x)+(-Math.sin(angle)*this.y);
+		this.y = (Math.sin(angle)*this.x)+(Math.cos(angle)*y);
 	}
+	
+	public void drawVector(Canvas c, Vector2 startPos, Paint p){
+		c.drawLine((float)startPos.x, (float)startPos.y, (float)(startPos.x+(100*x)), (float)(startPos.y+(100*y)), p);
+	}
+	
+	public boolean equals(Vector2 v, int tolerance) {
+		if((this.x >= v.x-tolerance && this.x <= v.x+tolerance) && (this.y <= v.y+tolerance && this.y >= v.y-tolerance)){
+			return true;
+		}
+		return false;
+	}
+	
 	
 }

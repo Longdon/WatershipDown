@@ -33,10 +33,7 @@ public class MainActivity extends Activity {
 	    Log.d("Main","Canvas init complete.");
         
         setContentView(canView);
-	    //setContentView(R.layout.activity_main);
-	    
-        
-        
+	    //setContentView(R.layout.activity_main);   
     }
 
     @Override
