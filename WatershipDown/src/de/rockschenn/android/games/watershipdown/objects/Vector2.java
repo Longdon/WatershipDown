@@ -49,8 +49,9 @@ public class Vector2 {
 	}
 	//Normalizes Vector a
 	public static Vector2 normalize(Vector2 a){
-		double nx = a.x/a.length();
-		double ny = a.y/a.length();
+		double l = a.length();
+		double nx = a.x/l;
+		double ny = a.y/l;
 		return new Vector2(nx,ny);
 	}
 	
