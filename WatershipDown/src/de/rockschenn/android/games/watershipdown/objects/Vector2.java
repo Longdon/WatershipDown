@@ -5,6 +5,9 @@ import android.graphics.Paint;
 import android.graphics.Point;
 
 public class Vector2 {
+	public static final Vector2 ZERO = new Vector2(0,0);
+	public static final Vector2 XAXIS = new Vector2(1,0);
+	public static final Vector2 YAXIS = new Vector2(0,1);
 	public double x;
 	public double y;
 	
@@ -40,8 +43,9 @@ public class Vector2 {
 	
 	//Normalizes this Vector - !!! Overrides existing values !!!
 	public void normalize(){
-		x = x/this.length();
-		y = y/this.length();
+		double l = this.length();
+		x = x/l;
+		y = y/l;
 	}
 	//Normalizes Vector a
 	public static Vector2 normalize(Vector2 a){
@@ -52,11 +56,11 @@ public class Vector2 {
 	
 	//Returns radian angle between this Vector and x-Axis
 	public double getAngleToXAxis(){
-		return this.getAngle(new Vector2(1,0));
+		return this.getAngle(Vector2.XAXIS);
 	}
 	//Returns radian angle between Vector a and x-Axis
 	public static double getAngleToXAxis(Vector2 a){
-		return a.getAngle(new Vector2(1,0));
+		return a.getAngle(Vector2.XAXIS);
 	}
 	
 	//Returns radian angle between this Vector and Vector v
@@ -70,8 +74,9 @@ public class Vector2 {
 	
 	public void rotate(double angle){
 		double x = this.x;
-		this.x = (Math.cos(angle)*x)+(-Math.sin(angle)*this.y);
-		this.y = (Math.sin(angle)*this.x)+(Math.cos(angle)*y);
+		double y = this.y;
+		this.x = (Math.cos(angle)*x)+(-Math.sin(angle)*y);
+		this.y = (Math.sin(angle)*x)+(Math.cos(angle)*y);
 	}
 	
 	public void drawVector(Canvas c, Vector2 startPos, Paint p){
@@ -84,6 +89,5 @@ public class Vector2 {
 		}
 		return false;
 	}
-	
 	
 }

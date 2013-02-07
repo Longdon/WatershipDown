@@ -9,6 +9,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -26,7 +27,7 @@ public class CanvasView extends SurfaceView{
 	private Paint paintBlue;
 	
 	private Point screenSize;
-	
+	private Rect viewPort;
 	
 	//-- Testing Stuff ---
 	private Bitmap bm;
@@ -72,11 +73,13 @@ public class CanvasView extends SurfaceView{
         // set screensize
         screenSize = size;
         screenSize.set(size.x, size.y);
+        viewPort = new Rect(0,0,size.x,size.y);
         
         //-- testing Stuff --
         bm = BitmapFactory.decodeResource(getResources(), R.drawable.carrier);
         go = new GameObject(bm);
         go.setPosition(new Vector2(250,500));
+        
         
         //testTarget = new GameObject(bm);
         testTarget = new Vector2(300,500);
@@ -87,6 +90,7 @@ public class CanvasView extends SurfaceView{
 	//Update GameObjects here
 	public void update(){
 		go.update();
+		
 	}
 	
 	@Override
@@ -104,6 +108,7 @@ public class CanvasView extends SurfaceView{
 	    		
 	    		c.drawCircle((float)testTarget.x, (float)testTarget.y, 10, paintRed);
 	    		c.drawText("("+(int)(testTarget.x)+"|"+(int)(testTarget.y)+")", (int)(testTarget.x)-30, (int)(testTarget.y)-50, paintRed);
+	    			    		
 			}
 		}
         
@@ -113,7 +118,6 @@ public class CanvasView extends SurfaceView{
 	public boolean onTouchEvent(MotionEvent event) {
 		testTarget = new Vector2(event.getX(),event.getY());
         go.setTarget(testTarget);
-		
         
         return super.onTouchEvent(event);
 	}

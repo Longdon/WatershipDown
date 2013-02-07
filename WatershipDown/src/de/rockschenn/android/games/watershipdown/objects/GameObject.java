@@ -18,18 +18,26 @@ public class GameObject {
 	//private double rotationSpeed = 0.1; //maximum angle the rotation will be manipulated
 	
 	private Vector2 target = null;
+	private boolean aligned = false;
+	
+	private Paint green;
 	
 	public GameObject(Bitmap b){
 		this.bitmap = b;
 		this.position = new Vector2(0,0);
 		this.velocity = new Vector2(0,1);
 		this.rotation = velocity.getAngleToXAxis();
+		
+		this.green = new Paint();
+		this.green.setColor(Color.GREEN);
 	}
 	
 	public void update(){		
 		if(target != null){
 			//Align Direction
-			alignToTarget();
+			if(!aligned){
+				alignToTarget();
+			}
 			
 			//Repositioning
 			moveObject();
@@ -45,12 +53,11 @@ public class GameObject {
 		c.drawBitmap(bitmap, matrix, null);		//Draw
 		
 		if(debug){
-			Paint green = new Paint();
-			green.setColor(Color.GREEN);
-			c.drawText("rot: "+rotation, 10, 10, green);
+			//c.drawText("rot: "+rotation, 10, 10, green);
 			
 			velocity.drawVector(c, position, green);
 			c.drawText("("+(int)position.x+"|"+(int)position.y+")", (int)(position.x+30), (int)(position.y+30), green);
+			
 		}
 	}
 	
@@ -76,6 +83,7 @@ public class GameObject {
 			else{
 				rotation = velocity.getAngleToXAxis();
 			}
+ 			aligned = true;
 		}
 	}
 	
@@ -86,6 +94,7 @@ public class GameObject {
 		position = pos;
 	}
 	public void setTarget(Vector2 t){
+		aligned = false;
 		target = t;
 	}
 }
