@@ -3,12 +3,16 @@ package de.rockschenn.android.games.watershipdown.objects;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.LightingColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.util.Log;
+import android.view.View;
 
 public class GameObject {
+	
 	private Bitmap bitmap;		//Bitmap of the Object
 	
 	private Vector2 position;		//Position of Bitmap-Center
@@ -20,7 +24,9 @@ public class GameObject {
 	private Vector2 target = null;
 	private boolean aligned = false;
 	
+	private Paint antiAlias;
 	private Paint green;
+	private Paint blendShadow;
 	
 	public GameObject(Bitmap b){
 		this.bitmap = b;
@@ -28,8 +34,15 @@ public class GameObject {
 		this.velocity = new Vector2(0,1);
 		this.rotation = velocity.getAngleToXAxis();
 		
-		this.green = new Paint();
-		this.green.setColor(Color.GREEN);
+		antiAlias = new Paint();
+		antiAlias.setAntiAlias(true);
+		green = new Paint();
+		green.setColor(Color.GREEN);
+		blendShadow = new Paint(Color.BLACK);
+		blendShadow.setAlpha(150);
+        ColorFilter filter = new LightingColorFilter(Color.BLACK, 1);
+        blendShadow.setColorFilter(filter);
+        
 	}
 	
 	public void update(){		
@@ -44,13 +57,26 @@ public class GameObject {
 		}
 	}
 	//TODO: Scale doesn't work correctly
-	public void drawGameObject(Canvas c, double scale, boolean debug){
-		Matrix matrix = new Matrix();	//Create new Matix
-		matrix.setRotate((float)Math.toDegrees(rotation), (float)(bitmap.getWidth()/2), (float)(bitmap.getHeight()/2));	//TODO:Rotate around bitmap-center, dont work
-		matrix.postTranslate((float)(position.x-bitmap.getWidth()/2), (float)(position.y-bitmap.getHeight()/2));	//Move to Position
-		//matrix.postScale((float)scale, (float)scale);
+	public void drawGameObject(Canvas c, double scale, boolean debug, Vector2 shadowOffset){
 		
-		c.drawBitmap(bitmap, matrix, null);		//Draw
+		Matrix matShadow = new Matrix();	//Create new Matix
+		//matrix.postScale((float)scale, (float)scale);
+		matShadow.postRotate((float)Math.toDegrees(rotation), (float)(bitmap.getWidth()/2), (float)(bitmap.getHeight()/2));	// Rotate
+		Matrix matBmp = new Matrix(matShadow);	//Create new Matix
+		
+		matShadow.postScale((float)scale, (float)scale);
+		matBmp.postScale((float)scale, (float)scale);
+		
+		matShadow.postTranslate((float)((position.x-(bitmap.getWidth()*scale)/2)+shadowOffset.x*scale), (float)((position.y-(bitmap.getHeight()*scale)/2)+shadowOffset.y*scale));	//Move to Position
+		matBmp.postTranslate((float)(position.x-(bitmap.getWidth()*scale)/2), (float)(position.y-(bitmap.getHeight()*scale)/2));	//Move to Position
+		
+		/* CodeBkp
+		matrix.postScale((float)scale, (float)scale);
+		matrix.postRotate((float)Math.toDegrees(rotation), (float)(bitmap.getWidth()/2), (float)(bitmap.getHeight()/2));	// Rotate
+		matrix.postTranslate((float)(position.x-bitmap.getWidth()/2), (float)(position.y-bitmap.getHeight()/2));	//Move to Position*/
+		
+		c.drawBitmap(bitmap, matShadow, blendShadow);	// Draw Shadow
+		c.drawBitmap(bitmap, matBmp, antiAlias);		//Draw Bitmap
 		
 		if(debug){
 			//c.drawText("rot: "+rotation, 10, 10, green);

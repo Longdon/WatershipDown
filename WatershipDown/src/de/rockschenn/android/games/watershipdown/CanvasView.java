@@ -12,6 +12,7 @@ import android.graphics.Point;
 import android.graphics.Rect;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.MotionEvent.PointerCoords;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -19,7 +20,7 @@ public class CanvasView extends SurfaceView{
 	private boolean debug = true;
 	private SurfaceHolder surfaceHolder;
 	
-	// some colors
+	// some paints
 	private Paint paintBlack;
 	private Paint paintWhite;
 	private Paint paintRed;
@@ -28,6 +29,13 @@ public class CanvasView extends SurfaceView{
 	
 	private Point screenSize;
 	private Rect viewPort;
+	private Vector2 shadowOffset;
+	private double scale = 0.5;
+	
+	private Vector2 downTouch1;
+	private Vector2 moveTouch1;
+	private Vector2 downTouch2;
+	private Vector2 moveTouch2;
 	
 	//-- Testing Stuff ---
 	private Bitmap bm;
@@ -74,6 +82,7 @@ public class CanvasView extends SurfaceView{
         screenSize = size;
         screenSize.set(size.x, size.y);
         viewPort = new Rect(0,0,size.x,size.y);
+        shadowOffset = new Vector2(-5,10);
         
         //-- testing Stuff --
         bm = BitmapFactory.decodeResource(getResources(), R.drawable.carrier);
@@ -99,27 +108,66 @@ public class CanvasView extends SurfaceView{
 		
 		//Log.d("CanView","drawing");
 		if(c != null){
-			// draws black background
-			c.drawColor(Color.BLACK);
+			// draws blue background
+			c.drawColor(Color.BLUE);
 			
 			// draw helping stuff here for bugfixing
 			if(debug){
-	    		go.drawGameObject(c,0.1, debug);	//Draw Test-GameObject
+	    		go.drawGameObject(c, scale, debug, shadowOffset);	//Draw Test-GameObject
 	    		
 	    		c.drawCircle((float)testTarget.x, (float)testTarget.y, 10, paintRed);
 	    		c.drawText("("+(int)(testTarget.x)+"|"+(int)(testTarget.y)+")", (int)(testTarget.x)-30, (int)(testTarget.y)-50, paintRed);
 	    			    		
 			}
 		}
-        
 	}
 	
+	//TODO: Get Multitouch working
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
-		testTarget = new Vector2(event.getX(),event.getY());
-        go.setTarget(testTarget);
-        
-        return super.onTouchEvent(event);
+		int action = event.getAction() & MotionEvent.ACTION_MASK;
+		
+		if(action == MotionEvent.ACTION_DOWN){
+			if(event.getPointerCount() == 1){
+				Log.d("CanView","SingleDown");
+				downTouch1 = new Vector2(event.getX(0),event.getY(0));
+				
+				testTarget = new Vector2(downTouch1);
+				go.setTarget(testTarget);
+			}
+		}
+		else if(action == MotionEvent.ACTION_POINTER_DOWN){
+			Log.d("CanView","DoubleDown");
+			downTouch1 = new Vector2(event.getX(0),event.getY(0));
+			downTouch2 = new Vector2(event.getX(1),event.getY(1));
+		}
+		else if(action == MotionEvent.ACTION_UP){
+			
+		}
+		else if(action == MotionEvent.ACTION_POINTER_UP){
+			
+		}
+		else if(action == MotionEvent.ACTION_MOVE){
+			if(event.getPointerCount() == 1){
+				Log.d("CanView","SingleMove");
+				moveTouch1 = new Vector2(event.getX(0),event.getY(0));
+			}
+			else if(event.getPointerCount() == 2){
+				//Pinch&Zoom
+				Log.d("CanView","DoubleMove");
+				moveTouch1 = new Vector2(event.getX(0),event.getY(0));
+				moveTouch2 = new Vector2(event.getX(1),event.getY(1));
+				
+				double downLength = new Vector2(downTouch1,downTouch2).length();
+				double moveLength = new Vector2(moveTouch1, moveTouch2).length();
+				
+				scale = moveLength/downLength;
+			}
+		}
+		
+		
+		
+		return true;//super.onTouchEvent(event);
 	}
 	
 	
