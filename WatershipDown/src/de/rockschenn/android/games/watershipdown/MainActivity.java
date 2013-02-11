@@ -2,6 +2,7 @@ package de.rockschenn.android.games.watershipdown;
 
 import android.os.Bundle;
 import android.app.Activity;
+import android.content.pm.ActivityInfo;
 import android.graphics.Point;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -18,6 +19,9 @@ public class MainActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        // force landscape
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         
         // set to fullscreen
         requestWindowFeature(Window.FEATURE_NO_TITLE);

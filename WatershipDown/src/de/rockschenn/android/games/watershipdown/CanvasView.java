@@ -1,6 +1,7 @@
 package de.rockschenn.android.games.watershipdown;
 
 import de.rockschenn.android.games.watershipdown.objects.GameObject;
+import de.rockschenn.android.games.watershipdown.objects.Map;
 import de.rockschenn.android.games.watershipdown.objects.Vector2;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -31,6 +32,9 @@ public class CanvasView extends SurfaceView{
 	private Rect viewPort;
 	private Vector2 shadowOffset;
 	private double scale = 0.5;
+	private double maxScale;
+	private double downScale;
+	private Map map;
 	
 	private Vector2 downTouch1;
 	private Vector2 moveTouch1;
@@ -39,6 +43,7 @@ public class CanvasView extends SurfaceView{
 	
 	//-- Testing Stuff ---
 	private Bitmap bm;
+	private Bitmap waterBmp;
 	private GameObject go;
 	private Vector2 testTarget;
 	//--------------------
@@ -75,6 +80,7 @@ public class CanvasView extends SurfaceView{
             public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
             	Log.d("CanView","SurfaceChanged");
             	
+            	
             }
         });
         
@@ -86,12 +92,16 @@ public class CanvasView extends SurfaceView{
         
         //-- testing Stuff --
         bm = BitmapFactory.decodeResource(getResources(), R.drawable.carrier);
+        waterBmp = BitmapFactory.decodeResource(getResources(), R.drawable.test_water);
+        map = new Map(waterBmp, 20000, 20000);
+        maxScale = 0.025;//TODO: screenSize.y/20000;
+        
         go = new GameObject(bm);
-        go.setPosition(new Vector2(250,500));
+        go.setPosition(new Vector2(250,250));
         
         
         //testTarget = new GameObject(bm);
-        testTarget = new Vector2(300,500);
+        testTarget = new Vector2(800,300);
         go.setTarget(testTarget);
         //-------------------
 	}
@@ -108,16 +118,16 @@ public class CanvasView extends SurfaceView{
 		
 		//Log.d("CanView","drawing");
 		if(c != null){
-			// draws blue background
-			c.drawColor(Color.BLUE);
+			map.drawMap(c, scale, debug);
 			
 			// draw helping stuff here for bugfixing
 			if(debug){
 	    		go.drawGameObject(c, scale, debug, shadowOffset);	//Draw Test-GameObject
 	    		
-	    		c.drawCircle((float)testTarget.x, (float)testTarget.y, 10, paintRed);
-	    		c.drawText("("+(int)(testTarget.x)+"|"+(int)(testTarget.y)+")", (int)(testTarget.x)-30, (int)(testTarget.y)-50, paintRed);
-	    			    		
+	    		c.drawCircle((float)(testTarget.x*scale), (float)(testTarget.y*scale), 10, paintRed);
+	    		c.drawText("("+(int)(testTarget.x*scale)+"|"+(int)(testTarget.y*scale)+")", (int)(testTarget.x*scale)-30, (int)(testTarget.y*scale)-50, paintRed);
+	    		
+	    		c.drawText("Scale | Max: "+scale+"|"+maxScale, 10, 10, paintRed);
 			}
 		}
 	}
@@ -130,16 +140,18 @@ public class CanvasView extends SurfaceView{
 		if(action == MotionEvent.ACTION_DOWN){
 			if(event.getPointerCount() == 1){
 				Log.d("CanView","SingleDown");
-				downTouch1 = new Vector2(event.getX(0),event.getY(0));
+				downTouch1 = new Vector2(event.getX(0)/scale,event.getY(0)/scale);
 				
 				testTarget = new Vector2(downTouch1);
 				go.setTarget(testTarget);
+				
 			}
 		}
 		else if(action == MotionEvent.ACTION_POINTER_DOWN){
 			Log.d("CanView","DoubleDown");
 			downTouch1 = new Vector2(event.getX(0),event.getY(0));
 			downTouch2 = new Vector2(event.getX(1),event.getY(1));
+			downScale = scale;
 		}
 		else if(action == MotionEvent.ACTION_UP){
 			
@@ -161,14 +173,16 @@ public class CanvasView extends SurfaceView{
 				double downLength = new Vector2(downTouch1,downTouch2).length();
 				double moveLength = new Vector2(moveTouch1, moveTouch2).length();
 				
-				scale = moveLength/downLength;
+				double delta = downScale*(moveLength/downLength);
+				if(delta > maxScale){
+					scale = delta;
+				}
+				else{
+					scale = maxScale;
+				}
 			}
 		}
 		
-		
-		
-		return true;//super.onTouchEvent(event);
+		return true;
 	}
-	
-	
 }
